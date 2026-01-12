@@ -161,6 +161,9 @@ export function calculateWindFromInputs(opts: {
 
   // Final site design wind speed (m/s)
   const Vsit =
+    windSpeed !== null && 
+    Mc !== null && 
+    Md !== null && 
     exposureProduct !== null
       ? Number((windSpeed * Mc * Md * exposureProduct).toFixed(2))
       : null;
