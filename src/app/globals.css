@@ -1,0 +1,465 @@
+/* --- Calculator Sections --- */
+.calc-section {
+  background: white;
+  border: 1px solid #e5e7eb; /* subtle gray */
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.calc-section:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.calc-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827; /* near-black */
+  margin-bottom: 1.25rem;
+  border-left: 4px solid #2563eb; /* blue accent */
+  padding-left: 0.75rem;
+}
+
+/* make spacing consistent for all inputs/buttons inside calculators */
+.calc-section form,
+.calc-section div,
+.calc-section label,
+.calc-section input,
+.calc-section button {
+  font-family: system-ui, sans-serif;
+}
+
+.calc-section input,
+.calc-section select,
+.calc-section textarea {
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calc-section input:focus,
+.calc-section select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.calc-section button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.calc-section button:hover {
+  background-color: #1d4ed8;
+  transform: scale(1.03);
+}
+
+.calc-toggle {
+  width: 100%;
+  background: #f9fafb;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  color: #111827;
+  transition: background-color 0.2s ease;
+}
+
+.arrow {
+  transition: transform 0.25s ease;
+}
+
+.arrow.rotate {
+  transform: rotate(180deg);
+}
+
+/* ---------- Workspace layout (light mode) ---------- */
+.ws-root {
+  --bg: #f5f6fa;
+  --panel: #ffffff;
+  --muted: #555;
+  --text: #111;
+  --border: #ddd;
+  --accent: #2563eb;
+
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 16px;
+  height: 100vh;
+  padding: 16px;                     /* equal padding on all sides */
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Prevent overall page scroll */
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #f5f6fa;
+}
+
+/* Left panel */
+.ws-left {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  position: relative;
+  overflow: hidden;
+}
+
+.ws-toolbar {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+
+.ws-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.ws-btn:hover {
+  filter: brightness(0.95);
+}
+.ws-btn.danger {
+  background: #ef4444;
+}
+
+.ws-canvas {
+  position: relative;
+  overflow: auto;              /* <— enable scroll */
+  border-radius: 0 0 12px 12px;
+  background: #fdfdfd;
+}
+
+/* Big inner “desk” to drop widgets on */
+.ws-canvas-inner {
+  position: relative;
+  width: 2600px;               /* expand if you want even larger */
+  height: 1800px;              /* expand if you want even larger */
+  background:
+    linear-gradient(transparent 39px, #eee 40px) 0 0 / 40px 40px,
+    linear-gradient(90deg, transparent 39px, #eee 40px) 0 0 / 40px 40px,
+    #fff;
+  /* ^ Optional light grid to help alignment */
+}
+
+/* Calculator picker */
+.ws-picker {
+  position: absolute;
+  top: 62px;
+  left: 14px;
+  width: 420px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  padding: 10px 12px;
+}
+.ws-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 2px;
+  border-bottom: 1px dashed var(--border);
+}
+.ws-picker-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+  max-height: 360px;
+  overflow: auto;
+}
+.ws-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fafafa;
+}
+.ws-picker-meta .title {
+  font-weight: 700;
+  color: #222;
+}
+.ws-picker-meta .desc {
+  color: #666;
+  font-size: 13px;
+}
+
+/* Draggable/resizable widget */
+.ws-widget {
+  position: absolute;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  user-select: none;
+  transition: height 0.2s ease;
+}
+.ws-widget-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  cursor: move;
+  background: #fafafa;
+}
+.ws-widget-titlebar .left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.ws-widget-titlebar .title {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #111;
+}
+.icon-btn {
+  background: #fff;
+  border: 1px solid var(--border);
+  color: #333;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.icon-btn:hover {
+  background: #f3f3f3;
+}
+
+.ws-widget-body {
+  overflow: auto;
+  padding: 8px;
+  background: #fff;
+}
+
+/* Resizers */
+.ws-resizer {
+  position: absolute;
+  background: transparent;
+}
+.ws-resizer.e {
+  cursor: ew-resize;
+  right: 0;
+  top: 0;
+  width: 10px;
+  height: 100%;
+}
+.ws-resizer.s {
+  cursor: ns-resize;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 10px;
+}
+.ws-resizer.se {
+  cursor: nwse-resize;
+  right: 0;
+  bottom: 0;
+  width: 14px;
+  height: 14px;
+}
+
+/* Right panel (AI) */
+.ws-right {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  width: 360px;
+  min-width: 360px;
+
+  flex-shrink: 0;
+  width: 360px;              /* fix exact width */
+  min-width: 360px;
+  font-size: 14px;           /* set baseline font size */
+  line-height: 1.4;
+}
+.ws-ai-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;       /* horizontal center */
+  justify-content: center;   /* vertical center */
+  text-align: center;        /* align text in center */
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+  flex-shrink: 0;
+}
+.ws-ai-head .h1 {
+  color: #111;
+
+  font-size: 26px;           /* a bit smaller so it fits nicely */  
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.muted {
+  color: #666;
+  font-size: 13px;
+}
+.ws-ai-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  padding-bottom: 60px; /* leaves space when scrolled to bottom */
+  background: #fff;
+}
+
+.ws-ai-empty {
+  color: #777;
+  font-size: 13px;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  text-align: center;
+  background: #fafafa;
+}
+.msg {
+  padding: 10px 12px;
+  border-radius: 10px;
+  max-width: 85%;
+}
+.msg.user {
+  background: #e5efff;
+  margin-left: auto;
+}
+.msg.assistant {
+  background: #f3f3f3;
+  margin-right: auto;
+}
+
+.ws-ai-input {
+  flex-shrink: 0;
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  background: #fafafa;
+
+  /* Add space at the very bottom (for aesthetics + safe area on macOS/iOS) */
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 8px));
+  margin-bottom: 2px; /* slight gap above panel border */
+}
+.ws-ai-input input {
+  flex: 1;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: #111;
+  padding: 0 12px;
+  outline: none;
+}
+.ws-ai-input button {
+  width: 44px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+}
+.ws-ai-input button:hover {
+  background: #f3f3f3;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .ws-root {
+    grid-template-columns: 1fr;
+  }
+  .ws-right {
+    min-height: 380px;
+  }
+}
+
+.ws-left,
+.ws-right {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.ws-ai-input {
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 8px));
+  margin-bottom: 8px; /* a bit more breathing room */
+}
+
+.ws-root {
+  overflow: visible; /* was hidden; allows shadows to show evenly */
+}
+
+/* Prevent body scroll */
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #f5f6fa;
+}
+
+/* ---------- Branding Centered ---------- */
+.ws-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: left; /* center horizontally */
+  position: relative;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+
+/* brand text centered & larger */
+.ws-brand {
+  font-size: 1.5rem;       /* larger font */
+  font-weight: 800;
+  color: #111;
+  letter-spacing: 0.5px;
+}
+
+/* keep buttons on the right edge */
+.ws-toolbar .ws-btn-group {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+}
